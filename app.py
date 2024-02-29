@@ -40,19 +40,29 @@ lung_cancer_model = joblib.load('models/lung_cancer_model.sav')
 
 
 # Connect to SQLite3 database
-conn = sqlite3.connect('patientData.db')
-cursor = conn.cursor()
+with sqlite3.connect('patientData.db') as conn:
+    cursor = conn.cursor()
 
-# Create a table to store user data if it doesn't exist
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS user_data (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        disease TEXT,
-        status TEXT
-    )
-''')
-conn.commit()
+    # Create a table to store user data if it doesn't exist
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS user_data (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            disease TEXT,
+            status TEXT
+        )
+    ''')
+    conn.commit()
+
+# Image paths
+positive_image_path = 'positive.jpg'
+negative_image_path = 'negative.jpg'
+
+# Function for disease prediction
+def predict_disease(model, features):
+    prediction = model.predict(features)
+    status = "Positive" if prediction[0] == 1 else "Negative"
+    return status
 
 
 # sidebar
@@ -67,6 +77,7 @@ with st.sidebar:
     ],
         icons=['','activity', 'heart', '', '',''],
         default_index=0)
+    
 
 
 # multiple disease prediction
@@ -82,13 +93,16 @@ if selected == 'Disease Prediction':
 
     X = prepare_symptoms_array(symptoms)
 
+    st.text_input("Name")
+    st.text_input("Email")
+    st.text_input("Mobile Number")
+    st.text_input("Age")
     # Trigger XGBoost model
+    
     if st.button('Predict'): 
         # Run the model with the python script
-        
         prediction, prob = disease_model.predict(X)
-        st.write(f'## Disease: {prediction} with {prob*100:.2f}% probability')
-
+        st.write(f'## Disease: {prediction} with {prob*100:.2f}% probability')       
 
         tab1, tab2= st.tabs(["Description", "Precautions"])
 
@@ -99,8 +113,6 @@ if selected == 'Disease Prediction':
             precautions = disease_model.predicted_disease_precautions()
             for i in range(4):
                 st.write(f'{i+1}. {precautions[i]}')
-
-
 
 
 # Diabetes prediction page
@@ -618,9 +630,3 @@ if selected == 'Kidney Prediction':
             INSERT INTO user_data (name, disease, status) VALUES (?, ?, ?)
         ''', (name, "Diabetes", status))
         conn.commit()
-
-with st.status("Developed By  👇 "):
-    st.write("Tushar Kumbhare")
-    st.write("Rutuja Deshmukh")
-    st.write("Isha Bisan")
-    st.write("Namrata Anjankar")
