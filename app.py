@@ -71,7 +71,7 @@ with st.sidebar:
         'Disease Prediction',
         'Diabetes Prediction',
         'Heart disease Prediction',
-        'Parkison Prediction',
+        'Parkinson Prediction',
         'Liver Prediction',
         'Kidney Prediction',
     ],
