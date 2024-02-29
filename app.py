@@ -322,8 +322,8 @@ if selected == 'Heart disease Prediction':
 
 
 
-if selected == 'Parkison Prediction':
-    st.title("Parkison prediction")
+if selected == 'Parkinson Prediction':
+    st.title("Parkinson prediction")
     image = Image.open('p1.jpg')
     st.image(image, caption='parkinsons disease')
 
